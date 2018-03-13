@@ -59,7 +59,7 @@ export class HomeComponent implements OnInit {
     this.http
       .get(`api/values`)
       .subscribe((res: any) => {
-        console.log(res);
+        console.log(res.json());
       });
   }
 
