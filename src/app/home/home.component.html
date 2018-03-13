@@ -1,0 +1,16 @@
+<div class="container-fluid">
+  <h2>Syntax analysis of simple sentences.</h2>
+  <h5 style="margin: 20px 0;">Type your text in textarea below and press button "Transform" to parse sentences to words.</h5>
+  <form [formGroup]="syntaxForm" novalidate>
+    <div>
+      <textarea name="" id="1" cols="30" rows="10" formControlName="text" class="form-control"></textarea>
+      <button class="btn btn-secondary" (click)="parseText()" style="margin: 20px 0;">Transform</button>
+    </div>
+    <div class="result-boxes">
+      <div class="result" *ngFor="let res of results">
+        {{res}}
+      </div>
+    </div>
+  </form>
+</div>
+<div class="background"></div>

@@ -1,0 +1,39 @@
+.logo {
+  width: 100px;
+}
+
+q {
+  font-style: italic;
+  font-size: 1.2rem;
+  quotes: "« " " »";
+}
+
+textarea {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+.result-boxes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  .result {
+    padding: 15px;
+    border: 1px solid lighten(#000, 40%);
+    margin-right: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, .8);
+  }
+}
+
+.background {
+  position: absolute;
+  z-index: -1;
+  min-height: 100vh;
+  min-width: 100vw;
+  top: 0;
+  background-image: url('/assets/d26fbe9c3593d996b1412bbae67a9d3ccc24acd50b6aac8e2894d082dcb8b035.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  opacity: .2;
+}
