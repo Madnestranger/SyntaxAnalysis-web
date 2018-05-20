@@ -53,6 +53,15 @@ export class HomeComponent implements OnInit {
       }
     });
     this.results = result;
+    this.getInfoAboutText();
+  }
+
+  getInfoAboutText() {
+    this.http
+      .post(`api/values`, {text: this.results})
+      .subscribe((res: any) => {
+        console.log(res.json());
+      });
   }
 
   getData() {
