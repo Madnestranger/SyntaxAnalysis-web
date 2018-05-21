@@ -11,12 +11,12 @@ import {Http} from "@angular/http";
 export class HomeComponent implements OnInit {
 
   syntaxForm: FormGroup;
-  results: string[];
+  results: any;
+  descriptions: any;
 
   constructor(private formBuilder: FormBuilder,
               private http: Http) {
     this.createForm();
-    this.getData();
   }
 
   ngOnInit() {
@@ -52,23 +52,25 @@ export class HomeComponent implements OnInit {
         result[index] = res.replace(' ', '');
       }
     });
-    this.results = result;
+    this.results = result.map((res: string) => {
+      return {
+        text: res,
+        part: "",
+        comment: ""
+      };
+    });
     this.getInfoAboutText();
   }
 
   getInfoAboutText() {
     this.http
-      .post(`api/values`, {text: this.results})
+      .post(`api/values`, {text: this.results.map((res: any) => res.text)})
       .subscribe((res: any) => {
-        console.log(res.json());
-      });
-  }
-
-  getData() {
-    this.http
-      .get(`api/values`)
-      .subscribe((res: any) => {
-        console.log(res.json());
+        this.descriptions = res.json();
+        this.descriptions.forEach((desc: any, index: number) => {
+          this.results[index].part = desc.part;
+          this.results[index].comment = desc.comment;
+        });
       });
   }
 

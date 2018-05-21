@@ -8,6 +8,7 @@ import {HomeRoutingModule} from './home-routing.module';
 import {HomeComponent} from './home.component';
 import {QuoteService} from './quote.service';
 import {ReactiveFormsModule} from '@angular/forms';
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import {ReactiveFormsModule} from '@angular/forms';
     CoreModule,
     SharedModule,
     ReactiveFormsModule,
-    HomeRoutingModule
+    HomeRoutingModule,
+    NgbModule
   ],
   declarations: [
     HomeComponent

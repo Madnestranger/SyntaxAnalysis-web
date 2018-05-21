@@ -7,8 +7,9 @@
       <button class="btn btn-secondary" (click)="parseText()" style="margin: 20px 0;">Transform</button>
     </div>
     <div class="result-boxes">
-      <div class="result" *ngFor="let res of results">
-        {{res}}
+      <div class="result" *ngFor="let res of results" placement="top" [ngbPopover]="res.comment" [popoverTitle]="'Коментар'">
+        <div class="text">{{res.text}}</div>
+        <div class="part" *ngIf="res.part">{{res.part}}</div>
       </div>
     </div>
   </form>
