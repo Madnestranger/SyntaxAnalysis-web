@@ -3,8 +3,8 @@ import * as env from './.env.json';
 
 export const environment = {
   production: true,
-  version: env.npm_package_version,
-  serverUrl: 'https://api.chucknorris.io',
+  version: '(prod)',
+  serverUrl: 'http://localhost:48748/',
   defaultLanguage: 'en-US',
   supportedLanguages: [
     'en-US',
