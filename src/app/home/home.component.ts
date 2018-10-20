@@ -116,27 +116,27 @@ export class HomeComponent implements OnInit {
     }
 
     // third symbol
-    if (shortDescription.charAt(2) === 's') {
+    if (shortDescription.charAt(2) === 's' && shortDescription.charAt(1) === " ") {
       result += 'однина';
     }
-    if (shortDescription.charAt(2) === 'p') {
+    if (shortDescription.charAt(2) === 'p' && shortDescription.charAt(1) === " ") {
       result += 'множина';
     }
-    if (shortDescription.charAt(2) === 'm') {
+    if (shortDescription.charAt(2) === 'm' && shortDescription.charAt(1) === " ") {
       result += 'чоловічий рід';
     }
-    if (shortDescription.charAt(2) === 'f') {
+    if (shortDescription.charAt(2) === 'f' && shortDescription.charAt(1) === " ") {
       result += 'жіночий рід';
     }
 
     // fifth symbol
-    if (shortDescription.charAt(4) === 'm') {
+    if (shortDescription.charAt(4) === 'm' && shortDescription.charAt(3) === " ") {
       result += ', чоловічий рід';
     }
-    if (shortDescription.charAt(4) === 'f') {
+    if (shortDescription.charAt(4) === 'f' && shortDescription.charAt(3) === " ") {
       result += ', жіночий рід';
     }
-    if (shortDescription.charAt(4) === 'n') {
+    if (shortDescription.charAt(4) === 'n' && shortDescription.charAt(3) === " ") {
       result += ', середній рід';
     }
 

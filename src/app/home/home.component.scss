@@ -20,7 +20,7 @@ textarea {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin-top: 50px;
+  margin-top: 70px;
   .result {
     position: relative;
     margin-right: 2rem;
@@ -39,6 +39,9 @@ textarea {
       padding: 3px;
       min-height: 60px;
       width: 100%;
+      span {
+        text-transform: capitalize;
+      }
     }
   }
 }

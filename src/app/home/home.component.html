@@ -9,7 +9,7 @@
     <div class="result-boxes">
       <div class="result" *ngFor="let res of results" placement="top" [ngbPopover]="res.comment" [popoverTitle]="'Коментар'">
         <div class="text">{{res.text}}</div>
-        <div class="part" *ngIf="res.part">{{res.part}}. {{res.part_of_speech}}</div>
+        <div class="part" *ngIf="res.part"><span>{{res.part}}</span>. {{res.part_of_speech}}</div>
       </div>
     </div>
   </form>
