@@ -1,0 +1,10 @@
+{
+  "APP_NAME": "SyntaxAnalysis",
+  "About": "Sobre",
+  "Hello world !": "Hola Mundo!",
+  "Home": "Casa",
+  "Version": "Versión",
+  "HEADER": "Análisis de sintaxis de oraciones simples.",
+  "SUBHEADER": "TEscriba su texto en el área de texto a continuación y presione el botón \"Ejecutar\" para analizar oraciones a palabras.",
+  "TRANSFORM_BUTTOM": "Ejecutar"
+}

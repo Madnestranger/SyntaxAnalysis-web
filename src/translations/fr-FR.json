@@ -1,7 +1,10 @@
 {
   "APP_NAME": "SyntaxAnalysis",
-  "About": "A propos",
-  "Hello world !": "Bonjour le monde !",
+  "About": "Sur",
+  "Hello world !": "Bonjour le monde!",
   "Home": "Accueil",
-  "Version": "Version"
+  "Version": "Version",
+  "HEADER": "Analyse de syntaxe de phrases simples.",
+  "SUBHEADER": "Tapez votre texte dans textarea ci-dessous et appuyez sur le bouton \"Exécuter\" analyser des phrases en mots.",
+  "TRANSFORM_BUTTOM": "Exécuter"
 }

@@ -9,7 +9,10 @@ export const environment = {
   serverUrl: 'http://localhost:48748/',
   defaultLanguage: 'en-US',
   supportedLanguages: [
+    'ua-RU',
     'en-US',
-    'fr-FR'
+    'fr-FR',
+    'es-ES',
+    'ru-RU'
   ]
 };

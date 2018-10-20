@@ -5,6 +5,9 @@ import { includes } from 'lodash';
 import { Logger } from './logger.service';
 import * as enUS from '../../translations/en-US.json';
 import * as frFR from '../../translations/fr-FR.json';
+import * as esES from '../../translations/es-ES.json';
+import * as ruRU from '../../translations/ru-RU.json';
+import * as uaRU from '../../translations/ua-RU.json';
 
 const log = new Logger('I18nService');
 const languageKey = 'language';
@@ -29,6 +32,9 @@ export class I18nService {
     // Embed languages to avoid extra HTTP requests
     translateService.setTranslation('en-US', enUS);
     translateService.setTranslation('fr-FR', frFR);
+    translateService.setTranslation('es-ES', esES);
+    translateService.setTranslation('ru-RU', ruRU);
+    translateService.setTranslation('ua-RU', uaRU);
   }
 
   /**
