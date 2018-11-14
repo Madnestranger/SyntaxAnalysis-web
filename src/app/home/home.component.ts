@@ -12,7 +12,7 @@ import {ResponseModel} from "./response.model";
 export class HomeComponent implements OnInit {
 
   syntaxForm: FormGroup;
-  results: any;
+  results: ResultModel[];
   descriptions: any;
   showLoader: boolean;
 
@@ -37,23 +37,6 @@ export class HomeComponent implements OnInit {
       result = result.split(' ');
     }
     result = result.filter((x: string) => x !== ',' && x !== '.' && x !== ':' && x !== ';' && x !== ' ' && x !== '');
-    result.forEach((res: string, index: number) => {
-      if (res.indexOf(',') !== -1) {
-        result[index] = res.replace(',', '');
-      }
-      if (res.indexOf('.') !== -1) {
-        result[index] = res.replace('.', '');
-      }
-      if (res.indexOf(';') !== -1) {
-        result[index] = res.replace(';', '');
-      }
-      if (res.indexOf(':') !== -1) {
-        result[index] = res.replace(':', '');
-      }
-      if (res.indexOf(' ') !== -1) {
-        result[index] = res.replace(' ', '');
-      }
-    });
     this.results = result.map((res: string) => {
       return {
         text: res,
@@ -62,6 +45,36 @@ export class HomeComponent implements OnInit {
         part_of_speech: ""
       };
     });
+    let sentenceCounter = 1;
+    this.results.forEach((res: ResultModel, index: number) => {
+      if (index === 0) {
+        this.results[0].is_start = true;
+        this.results[0].order = sentenceCounter;
+      }
+      if (res.text.indexOf(',') !== -1) {
+        this.results[index].text = res.text.replace(',', '');
+      }
+      if (res.text.indexOf(';') !== -1) {
+        this.results[index].text = res.text.replace(';', '');
+      }
+      if (res.text.indexOf(':') !== -1) {
+        this.results[index].text = res.text.replace(':', '');
+      }
+      if (res.text.indexOf(' ') !== -1) {
+        this.results[index].text = res.text.replace(' ', '');
+      }
+      if (res.text.indexOf('.') !== -1) {
+        this.results[index].is_end = true;
+        this.results[index].order = sentenceCounter;
+        sentenceCounter++;
+        if (this.results.length >= index + 2) {
+          this.results[index + 1].is_start = true;
+          this.results[index + 1].order = sentenceCounter;
+        }
+        this.results[index].text = res.text.replace('.', '');
+      }
+    });
+
     this.getInfoAboutText();
   }
 
@@ -206,4 +219,14 @@ export class HomeComponent implements OnInit {
     return result;
   }
 
+}
+
+class ResultModel {
+  text: string;
+  part: string;
+  comment: string;
+  part_of_speech: string;
+  order?: number;
+  is_start?: boolean;
+  is_end?: boolean;
 }
