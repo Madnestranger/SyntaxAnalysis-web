@@ -8,7 +8,13 @@
               [disabled]="!syntaxForm.value.text" translate>TRANSFORM_BUTTOM</button>
     </div>
     <div class="result-boxes">
-      <div class="result" *ngFor="let res of results" placement="top" [class.end]="res.is_end" [class.start]="res.is_start" [ngbPopover]="res.comment"
+      <div class="result" *ngFor="let res of results" placement="top"
+           [class.end]="res.is_end"
+           [class.start]="res.is_start"
+           [class.pidmet]="res.is_pidmet"
+           [class.prysudok]="res.is_prysudok"
+           [class.oznachennia]="res.is_oznachennia"
+           [ngbPopover]="res.comment"
            [popoverTitle]="'Коментар'">
         <div class="order" *ngIf="res.order">{{res.order}}</div>
         <div class="text">{{res.text}}</div>

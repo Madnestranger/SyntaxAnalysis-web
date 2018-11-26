@@ -29,6 +29,35 @@ textarea {
     padding: 15px;
     border: 5px solid transparent;
 
+    &.pidmet {
+      border-bottom: 3px solid black;
+    }
+    &.prysudok {
+      border-bottom: 3px solid black;
+      position: relative;
+      &::after {
+        position: absolute;
+        content: "";
+        width: 100%;
+        bottom: 4px;
+        height: 3px;
+        background-color: black;
+        right: 0;
+      }
+    }
+    &.oznachennia {
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -43px;
+        right: 0;
+        width: 100%;
+        height: 90px;
+        background-image: url(/assets/curvy_line.png);
+        z-index: 10;
+        background-size: contain;
+      }
+    }
     &.start {
       border-left: 5px solid black;
       border-top: 5px solid black;

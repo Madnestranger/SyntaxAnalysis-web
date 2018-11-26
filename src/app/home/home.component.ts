@@ -13,7 +13,7 @@ export class HomeComponent implements OnInit {
 
   syntaxForm: FormGroup;
   results: ResultModel[];
-  descriptions: any;
+  descriptions: ResponseModel[];
   showLoader: boolean;
 
   constructor(private formBuilder: FormBuilder,
@@ -90,6 +90,16 @@ export class HomeComponent implements OnInit {
             this.results[index].part = desc.part;
             this.results[index].comment = desc.comment;
             this.results[index].part_of_speech = this.returnPartOfSpeechFullDescription(desc.part_of_speech);
+            if (desc.part.indexOf("прикметник") === 0) {
+              this.results[index].is_oznachennia = true;
+            }
+            if (desc.part.indexOf("іменник") === 0) {
+              this.results[index].is_pidmet = true;
+              if ((index + 1) !== this.descriptions.length
+                && this.descriptions[index + 1].part.indexOf("дієслово") === 0) {
+                this.results[index + 1].is_prysudok = true;
+              }
+            }
           }
         });
       }, () => {
@@ -229,4 +239,7 @@ class ResultModel {
   order?: number;
   is_start?: boolean;
   is_end?: boolean;
+  is_pidmet?: boolean;
+  is_prysudok?: boolean;
+  is_oznachennia?: boolean;
 }
