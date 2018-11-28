@@ -90,16 +90,22 @@ export class HomeComponent implements OnInit {
             this.results[index].part = desc.part;
             this.results[index].comment = desc.comment;
             this.results[index].part_of_speech = this.returnPartOfSpeechFullDescription(desc.part_of_speech);
-            if (desc.part.indexOf("прикметник") === 0) {
+            if (desc.part && desc.part.indexOf("прикметник") === 0) {
               this.results[index].is_oznachennia = true;
             }
-            if (desc.part.indexOf("іменник") === 0) {
+
+            if (desc.part && desc.part.indexOf("іменник") === 0) {
               this.results[index].is_pidmet = true;
               if ((index + 1) !== this.descriptions.length
                 && this.descriptions[index + 1].part.indexOf("дієслово") === 0) {
                 this.results[index + 1].is_prysudok = true;
               }
             }
+          }
+        });
+        this.results.forEach((x: ResultModel) => {
+          if (!x.is_pidmet && !x.is_prysudok && !x.is_oznachennia) {
+            x.is_obstavyna = true;
           }
         });
       }, () => {
@@ -242,4 +248,5 @@ class ResultModel {
   is_pidmet?: boolean;
   is_prysudok?: boolean;
   is_oznachennia?: boolean;
+  is_obstavyna?: boolean;
 }
