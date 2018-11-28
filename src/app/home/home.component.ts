@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import * as _ from 'lodash';
 import {Http} from "@angular/http";
 import {ResponseModel} from "./response.model";
+import 'rxjs/add/operator/map';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +16,8 @@ export class HomeComponent implements OnInit {
   results: ResultModel[];
   descriptions: ResponseModel[];
   showLoader: boolean;
+  findSubjectShift = 3;
+  config: Config[];
 
   constructor(private formBuilder: FormBuilder,
               private http: Http) {
@@ -22,6 +25,22 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    const xhr = new XMLHttpRequest();
+    const self = this;
+    xhr.open('GET', 'assets/schema.json', true);
+    xhr.responseType = 'blob';
+    xhr.onload = function() {
+      if (this.status === 200) {
+        const file = new File([this.response], 'temp');
+        const fileReader = new FileReader();
+        fileReader.addEventListener('load', function(data: any) {
+          self.config = JSON.parse(data.target.result);
+          console.log(self.config);
+        });
+        fileReader.readAsText(file);
+      }
+    };
+    xhr.send();
   }
 
   createForm() {
@@ -90,27 +109,87 @@ export class HomeComponent implements OnInit {
             this.results[index].part = desc.part;
             this.results[index].comment = desc.comment;
             this.results[index].part_of_speech = this.returnPartOfSpeechFullDescription(desc.part_of_speech);
-            if (desc.part && desc.part.indexOf("прикметник") === 0) {
-              this.results[index].is_oznachennia = true;
-            }
+          }
+        });
 
-            if (desc.part && desc.part.indexOf("іменник") === 0) {
-              this.results[index].is_pidmet = true;
-              if ((index + 1) !== this.descriptions.length
-                && this.descriptions[index + 1].part.indexOf("дієслово") === 0) {
-                this.results[index + 1].is_prysudok = true;
+        // Second Algorithm due to schema
+        this.config.forEach((x: Config) => {
+          if (this.results.length === x.data.schema.length) { // check for similar schema length
+            for (let i = 0; i < this.results.length; i++) {
+              if (x.data.schema[i].split(" ").length > 1) {
+                const syntaxDescription = x.data.schema[i].split(" "); // 0 - частина мови, 1 - відмінок
+                if (this.results[i].part.toLowerCase().indexOf(syntaxDescription[0]) >= 0 &&
+                this.results[i].part_of_speech.toLowerCase().indexOf(syntaxDescription[1]) >= 0) {
+                  this.setValue(x.data.syntax[i], i);
+                }
+              } else {
+                if (x.data.schema[i] === "") {
+                  this.results[i].is_obstavyna = true;
+                  continue;
+                }
+                console.log(this.results[i].part);
+                console.log(x.data.schema[i]);
+                console.log(this.results[i].part.toLowerCase());
+                console.log(this.results[i].part.toLowerCase().indexOf(x.data.schema[i]));
+                if (this.results[i].part && this.results[i].part.toLowerCase().indexOf(x.data.schema[i]) >= 0) {
+                 this.setValue(x.data.syntax[i], i);
+                }
               }
             }
           }
         });
-        this.results.forEach((x: ResultModel) => {
-          if (!x.is_pidmet && !x.is_prysudok && !x.is_oznachennia) {
-            x.is_obstavyna = true;
-          }
-        });
+
+        // First Algorithm Of Getting Info From Subject
+        // this.results.forEach((result: ResultModel, index: number) => {
+        //   if (result.part && result.part.toLowerCase().indexOf("прикметник") === 0) {
+        //     result.is_oznachennia = true;
+        //   }
+        //
+        //   if (result.part && result.part_of_speech &&
+        //     ((result.part.toLowerCase().indexOf("іменник") >= 0 && result.part_of_speech.toLowerCase().indexOf("називний") >= 0) ||
+        //     (result.part.toLowerCase().indexOf("іменник") >= 0 && result.part_of_speech.toLowerCase().indexOf("відмінок") === -1) ||
+        //     (result.part.toLowerCase().indexOf("займенник") >= 0 && result.part_of_speech.toLowerCase().indexOf("називний") >= 0))) {
+        //     result.is_pidmet = true;
+        //     this.checkSubjectSiblings(index);
+        //   }
+        // });
+
+        // this.results.forEach((x: ResultModel) => {
+        //   if (!x.is_pidmet && !x.is_prysudok && !x.is_oznachennia) {
+        //     x.is_obstavyna = true;
+        //   }
+        // });
       }, () => {
         this.showLoader = false;
       });
+  }
+
+  setValue(key: string, i: number) {
+    if (key === "підмет") {
+      this.results[i].is_pidmet = true;
+    }
+    if (key === "присудок") {
+      this.results[i].is_prysudok = true;
+    }
+    if (key === "означення") {
+      this.results[i].is_oznachennia = true;
+    }
+    if (key === "обставина") {
+      this.results[i].is_obstavyna = true;
+    }
+  }
+
+  checkSubjectSiblings(index: number) {
+    let from = index - this.findSubjectShift;
+    if (from < 0) {
+      from = 0;
+    }
+    const to = index + this.findSubjectShift;
+    for (let i = from; i <= to; i++) {
+      if (this.results[i] && this.results[i].part && this.results[i].part.toLowerCase().indexOf("дієслово") >= 0) {
+        this.results[i].is_prysudok = true;
+      }
+    }
   }
 
   returnPartOfSpeechFullDescription(shortDescription: string): string {
@@ -249,4 +328,14 @@ class ResultModel {
   is_prysudok?: boolean;
   is_oznachennia?: boolean;
   is_obstavyna?: boolean;
+}
+
+class Config {
+  index: number;
+  data: ConfigData;
+}
+
+class ConfigData {
+  schema: string[];
+  syntax: string[];
 }
