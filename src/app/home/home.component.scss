@@ -21,7 +21,7 @@ ngx-cytoscape {
   float: left;
   position: relative;
   border: solid #21c0c0;
-  width: 50em;
+  width: calc(100vw - 30px);
 }
 
 .result-boxes {

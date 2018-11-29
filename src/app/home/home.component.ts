@@ -15,15 +15,15 @@ export class HomeComponent implements OnInit {
   results: ResultModel[];
   descriptions: ResponseModel[];
   showLoader: boolean;
-  findSubjectShift = 3;
-  config: Config[];
   graphData: any;
+  showGraph: boolean;
 
   constructor(private formBuilder: FormBuilder, private http: Http) {
     this.createForm();
     this.graphData = {
       nodes: [],
-      edges: [{ data: { source: "j", target: "e", faveColor: "#6FB1FC" } }]
+      edges: []
+      // edges: [{ data: { source: "j", target: "e", faveColor: "#6FB1FC" } }]
     };
   }
 
@@ -85,6 +85,7 @@ export class HomeComponent implements OnInit {
 
   getInfoAboutText() {
     this.showLoader = true;
+    this.showGraph = false;
     this.http.post(`api/values`, { text: this.results.map((res: any) => res.text.toLowerCase().trim()) }).subscribe(
       (res: any) => {
         this.descriptions = res.json();
@@ -97,8 +98,9 @@ export class HomeComponent implements OnInit {
           }
         });
         console.log(this.results);
-        const nodes = [{ data: { id: "s", name: "S", faveColor: this.getRandomColor(), faveShape: "rectangle" } }];
-        this.graphData.nodes = nodes;
+        this.graphData.nodes = [{ data: { id: "s", name: "S", faveColor: this.getRandomColor(), faveShape: "rectangle" } }];
+        this.findSubjects();
+        this.showGraph = true;
       },
       () => {
         this.showLoader = false;
@@ -106,13 +108,72 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  findSubjects() {
+    this.results.forEach((x: ResultModel, index: number) => {
+      if (x.part && x.part.toLowerCase().indexOf("іменник") >= 0) {
+        const adjectives = this.checkAdjectiveGroupNearTheSubject(index);
+        if (adjectives && adjectives.length > 0) {
+          this.graphData.nodes.push({
+            data: {id: x.text + " NP", name: "NP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+          });
+          this.graphData.nodes.push({
+            data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+          });
+          this.graphData.nodes.push({
+            data: {id: x.text + " AP", name: "AP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+          });
+          this.graphData.edges.push({
+            data: {source: "s", target: x.text + " NP", faveColor: this.getRandomColor()}
+          });
+          this.graphData.edges.push({
+            data: {source: x.text + " NP", target: x.text + " AP", faveColor: this.getRandomColor()}
+          });
+          this.graphData.edges.push({
+            data: {source: x.text + " NP", target: x.text, faveColor: this.getRandomColor()}
+          });
+          adjectives.forEach((y: ResultModel) => {
+            this.graphData.nodes.push({
+              data: {id: y.text, name: y.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+            });
+            this.graphData.edges.push({
+              data: {source: x.text + " AP", target: y.text, faveColor: this.getRandomColor()}
+            });
+          });
+        }
+      }
+    });
+  }
+
+  checkAdjectiveGroupNearTheSubject(index: number) {
+    const adjectiveGroup: ResultModel[] = [];
+    if (index >= 1 && this.results[index - 1] && this.results[index - 1].part
+      && this.results[index - 1].part.toLowerCase().indexOf("прикметник") >= 0) {
+      adjectiveGroup.push(this.results[index - 1]);
+      index--;
+      index--;
+      while (index >= 0) {
+        if (this.results[index] && this.results[index].part.toLowerCase().indexOf("сполучник") >= 0) {
+          index--;
+          continue;
+        }
+        if (this.results[index] && this.results[index].part.toLowerCase().indexOf("прикметник") >= 0) {
+          adjectiveGroup.push(this.results[index]);
+        }
+        index--;
+      }
+    }
+    return adjectiveGroup;
+  }
+
   getRandomColor() {
     const colors = ["#6FB1FC", "#EDA1ED", "#86B342", "#F5A45D"];
-    return colors[this.getRandomArbitrary(0, colors.length)];
+    return colors[this.getRandomArbitrary(0, colors.length - 1)];
   }
 
   getRandomArbitrary (min: number, max: number) {
-    return Math.random() * (max - min) + min;
+    let rand = min - 0.5 + Math.random() * (max - min + 1);
+    rand = Math.round(rand);
+    return rand;
   }
 
   returnPartOfSpeechFullDescription(shortDescription: string): string {
@@ -250,14 +311,4 @@ class ResultModel {
   is_prysudok?: boolean;
   is_oznachennia?: boolean;
   is_obstavyna?: boolean;
-}
-
-class Config {
-  index: number;
-  data: ConfigData;
-}
-
-class ConfigData {
-  schema: string[];
-  syntax: string[];
 }
