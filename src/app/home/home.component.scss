@@ -16,6 +16,14 @@ textarea {
   background-color: rgba(255, 255, 255, .9);
 }
 
+ngx-cytoscape {
+  height: 50vh;
+  float: left;
+  position: relative;
+  border: solid #21c0c0;
+  width: 50em;
+}
+
 .result-boxes {
   display: flex;
   align-items: center;

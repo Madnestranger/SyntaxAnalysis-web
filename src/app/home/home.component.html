@@ -7,6 +7,7 @@
       <button class="btn btn-secondary" (click)="parseText()" style="margin: 20px 0;"
               [disabled]="!syntaxForm.value.text" translate>TRANSFORM_BUTTOM</button>
     </div>
+    <ngx-cytoscape [elements]="graphData"></ngx-cytoscape>
     <div class="result-boxes">
       <div class="result" *ngFor="let res of results" placement="top"
            [class.end]="res.is_end"

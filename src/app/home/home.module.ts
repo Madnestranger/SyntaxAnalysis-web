@@ -9,6 +9,7 @@ import {HomeComponent} from './home.component';
 import {QuoteService} from './quote.service';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {CytoscapeModule} from "ngx-cytoscape";
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
     SharedModule,
     ReactiveFormsModule,
     HomeRoutingModule,
-    NgbModule
+    NgbModule,
+    CytoscapeModule
   ],
   declarations: [
     HomeComponent
