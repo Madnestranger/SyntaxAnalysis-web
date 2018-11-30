@@ -232,22 +232,22 @@ export class HomeComponent implements OnInit {
           data: {source: subject.text + " NP", target: subSubject.text, faveColor: this.getRandomColor()}
         });
       }
-      // if (adjectives && adjectives.length > 0) {
-      //   this.graphData.nodes.push({
-      //     data: {id: subject.text + " AP", name: "AP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
-      //   });
-      //   this.graphData.edges.push({
-      //     data: {source: subject.text + " NP", target: subject.text + " AP", faveColor: this.getRandomColor()}
-      //   });
-      //   adjectives.forEach((x: any) => {
-      //     this.graphData.nodes.push({
-      //       data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
-      //     });
-      //     this.graphData.edges.push({
-      //       data: {source: subject.text + " AP", target: x.text, faveColor: this.getRandomColor()}
-      //     });
-      //   });
-      // }
+      if (adjectives && adjectives.length > 0) {
+        this.graphData.nodes.push({
+          data: {id: subject.text + " AP", name: "AP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.edges.push({
+          data: {source: subject.text + " NP", target: subject.text + " AP", faveColor: this.getRandomColor()}
+        });
+        adjectives.forEach((x: any) => {
+          this.graphData.nodes.push({
+            data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+          });
+          this.graphData.edges.push({
+            data: {source: subject.text + " AP", target: x.text, faveColor: this.getRandomColor()}
+          });
+        });
+      }
     }
   }
 
