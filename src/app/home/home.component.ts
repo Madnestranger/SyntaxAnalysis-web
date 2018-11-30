@@ -172,8 +172,8 @@ export class HomeComponent implements OnInit {
   }
 
   findNPinVP(index: number, parentId: string) {
-    let subject = null;
-    let subSubject = null;
+    let subject: any = null;
+    let subSubject: any = null;
     const adjectives = [];
     if (index >= 1) { // check for search BEFORE verb
       let localIndex = index;
