@@ -7,22 +7,22 @@
       <button class="btn btn-secondary" (click)="parseText()" style="margin: 20px 0;"
               [disabled]="!syntaxForm.value.text" translate>TRANSFORM_BUTTOM</button>
     </div>
-    <ngx-cytoscape [elements]="graphData" *ngIf="showGraph"></ngx-cytoscape>
-    <div class="result-boxes">
-      <div class="result" *ngFor="let res of results" placement="top"
-           [class.end]="res.is_end"
-           [class.start]="res.is_start"
-           [class.pidmet]="res.is_pidmet"
-           [class.prysudok]="res.is_prysudok"
-           [class.oznachennia]="res.is_oznachennia"
-           [class.obstavyna]="res.is_obstavyna"
-           [ngbPopover]="res.comment"
-           [popoverTitle]="'Коментар'">
-        <div class="order" *ngIf="res.order">{{res.order}}</div>
-        <div class="text">{{res.text}}</div>
-        <div class="part" *ngIf="res.part"><span>{{res.part}}</span>. {{res.part_of_speech}}</div>
-      </div>
-    </div>
+    <ngx-cytoscape [elements]="graphData" *ngIf="showGraph" [layout]="layout"></ngx-cytoscape>
+    <!--<div class="result-boxes">-->
+      <!--<div class="result" *ngFor="let res of results" placement="top"-->
+           <!--[class.end]="res.is_end"-->
+           <!--[class.start]="res.is_start"-->
+           <!--[class.pidmet]="res.is_pidmet"-->
+           <!--[class.prysudok]="res.is_prysudok"-->
+           <!--[class.oznachennia]="res.is_oznachennia"-->
+           <!--[class.obstavyna]="res.is_obstavyna"-->
+           <!--[ngbPopover]="res.comment"-->
+           <!--[popoverTitle]="'Коментар'">-->
+        <!--<div class="order" *ngIf="res.order">{{res.order}}</div>-->
+        <!--<div class="text">{{res.text}}</div>-->
+        <!--<div class="part" *ngIf="res.part"><span>{{res.part}}</span>. {{res.part_of_speech}}</div>-->
+      <!--</div>-->
+    <!--</div>-->
   </form>
 </div>
 <app-loader *ngIf="showLoader"></app-loader>

@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import * as _ from "lodash";
-import { Http } from "@angular/http";
-import { ResponseModel } from "./response.model";
+import {Http} from "@angular/http";
+import {ResponseModel} from "./response.model";
 import "rxjs/add/operator/map";
 
 @Component({
@@ -17,17 +17,20 @@ export class HomeComponent implements OnInit {
   showLoader: boolean;
   graphData: any;
   showGraph: boolean;
+  layout: any = {
+    name: 'dagre'
+  };
 
   constructor(private formBuilder: FormBuilder, private http: Http) {
     this.createForm();
     this.graphData = {
       nodes: [],
       edges: []
-      // edges: [{ data: { source: "j", target: "e", faveColor: "#6FB1FC" } }]
     };
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   createForm() {
     this.syntaxForm = this.formBuilder.group({
@@ -86,7 +89,9 @@ export class HomeComponent implements OnInit {
   getInfoAboutText() {
     this.showLoader = true;
     this.showGraph = false;
-    this.http.post(`api/values`, { text: this.results.map((res: any) => res.text.toLowerCase().trim()) }).subscribe(
+    this.graphData.nodes = [];
+    this.graphData.edges = [];
+    this.http.post(`api/values`, {text: this.results.map((res: any) => res.text.toLowerCase().trim())}).subscribe(
       (res: any) => {
         this.descriptions = res.json();
         this.showLoader = false;
@@ -98,8 +103,13 @@ export class HomeComponent implements OnInit {
           }
         });
         console.log(this.results);
-        this.graphData.nodes = [{ data: { id: "s", name: "S", faveColor: this.getRandomColor(), faveShape: "rectangle" } }];
-        this.findSubjects();
+        this.graphData.nodes = [
+          {
+            data: {id: "s", name: "S", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+          }
+        ];
+        this.findNounPhrase();
+        this.findVerbPhrase();
         this.showGraph = true;
       },
       () => {
@@ -108,28 +118,161 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  findSubjects() {
+  criteriaOfSubjectInPhraseGroup(x: ResultModel, index: number): boolean {
+    return x.part && x.part.toLowerCase().indexOf("іменник") >= 0 && x.part_of_speech &&
+      (x.part_of_speech.toLowerCase().indexOf("називний") >= 0 ||
+        x.part_of_speech.toLowerCase().indexOf("знахідний") >= 0 ||
+        x.part_of_speech.toLowerCase().indexOf("родовий") >= 0) &&
+      !this.checkIfBeforeThisIsNotSmth(index, "дієслово") &&
+      !this.checkIfBeforeThisIsNotSmth(index, "іменник");
+  }
+
+  checkIfBeforeThisIsNotSmth(index: number, part: string, before: boolean = true): boolean {
+    const newIndex = before ? index - 1 : index + 1;
+    if (newIndex >= 0 && newIndex <= (this.results.length - 1)) {
+      if (this.results[newIndex].part.indexOf(part) >= 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  criteriaOfVerbPhrase(x: ResultModel): boolean {
+    return x.part && x.part.toLowerCase().indexOf("дієслово") >= 0;
+  }
+
+  verbFullTextPrefix(index: number) {
+    let prefix = "";
+    const prefixes = ["не", "буде", "дуже"];
+    if (this.results[index - 1] && prefixes.indexOf(this.results[index - 1].text) >= 0) {
+      prefix = prefixes[prefixes.indexOf(this.results[index - 1].text)] + " ";
+    }
+    return prefix;
+  }
+
+  findVerbPhrase() {
     this.results.forEach((x: ResultModel, index: number) => {
-      if (x.part && x.part.toLowerCase().indexOf("іменник") >= 0) {
+      if (this.criteriaOfVerbPhrase(x)) {
+        this.graphData.nodes.push({
+          data: {id: x.text + " VP", name: "VP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.nodes.push({
+          data: {id: x.text, name: this.verbFullTextPrefix(index) +  x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.edges.push({
+          data: {source: "s", target: x.text + " VP", faveColor: this.getRandomColor()}
+        });
+        this.graphData.edges.push({
+          data: {source: x.text + " VP", target: x.text, faveColor: this.getRandomColor()}
+        });
+        this.findNPinVP(index, x.text + " VP");
+      }
+    });
+    console.log(this.graphData);
+  }
+
+  findNPinVP(index: number, parentId: string) {
+    let subject = null;
+    let subSubject = null;
+    const adjectives = [];
+    if (index >= 1) { // check for search BEFORE verb
+      let localIndex = index;
+      localIndex--;
+
+      // while (index >= 0) {
+      //
+      // }
+    }
+    if (index < (this.results.length - 1)) { // check for search AFTER verb
+      index++;
+      while (index <= (this.results.length - 1)) {
+        if (this.results[index] && this.results[index].part
+          && this.results[index].part.toLowerCase().indexOf("сполучник") >= 0) {
+          index++;
+          continue;
+        }
+        if (this.results[index] && this.results[index].part
+          && this.results[index].part.toLowerCase().indexOf("іменник") >= 0) {
+          if (!subject) {
+            subject = this.results[index];
+            index++;
+            continue;
+          } else {
+            subSubject = this.results[index];
+            break;
+          }
+        }
+        if (this.results[index] && this.results[index].part
+          && this.results[index].part.toLowerCase().indexOf("прикметник") >= 0) {
+          adjectives.push(this.results[index]);
+          index++;
+        } else {
+          break;
+        }
+      }
+    }
+    if (subject) {
+      this.graphData.nodes.push({
+        data: {id: subject.text + " NP", name: "NP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+      });
+      this.graphData.nodes.push({
+        data: {id: subject.text, name: subject.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+      });
+      this.graphData.edges.push({
+        data: {source: parentId, target: subject.text + " NP", faveColor: this.getRandomColor()}
+      });
+      this.graphData.edges.push({
+        data: {source: subject.text + " NP", target: subject.text, faveColor: this.getRandomColor()}
+      });
+      if (subSubject) {
+        this.graphData.nodes.push({
+          data: {id: subSubject.text, name: subSubject.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.edges.push({
+          data: {source: subject.text + " NP", target: subSubject.text, faveColor: this.getRandomColor()}
+        });
+      }
+      // if (adjectives && adjectives.length > 0) {
+      //   this.graphData.nodes.push({
+      //     data: {id: subject.text + " AP", name: "AP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+      //   });
+      //   this.graphData.edges.push({
+      //     data: {source: subject.text + " NP", target: subject.text + " AP", faveColor: this.getRandomColor()}
+      //   });
+      //   adjectives.forEach((x: any) => {
+      //     this.graphData.nodes.push({
+      //       data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+      //     });
+      //     this.graphData.edges.push({
+      //       data: {source: subject.text + " AP", target: x.text, faveColor: this.getRandomColor()}
+      //     });
+      //   });
+      // }
+    }
+  }
+
+  findNounPhrase() {
+    this.results.forEach((x: ResultModel, index: number) => {
+      if (this.criteriaOfSubjectInPhraseGroup(x, index)) {
+        this.graphData.nodes.push({
+          data: {id: x.text + " NP", name: "NP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.nodes.push({
+          data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
+        });
+        this.graphData.edges.push({
+          data: {source: "s", target: x.text + " NP", faveColor: this.getRandomColor()}
+        });
+        this.graphData.edges.push({
+          data: {source: x.text + " NP", target: x.text, faveColor: this.getRandomColor()}
+        });
         const adjectives = this.checkAdjectiveGroupNearTheSubject(index);
         if (adjectives && adjectives.length > 0) {
-          this.graphData.nodes.push({
-            data: {id: x.text + " NP", name: "NP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
-          });
-          this.graphData.nodes.push({
-            data: {id: x.text, name: x.text, faveColor: this.getRandomColor(), faveShape: "rectangle"}
-          });
           this.graphData.nodes.push({
             data: {id: x.text + " AP", name: "AP", faveColor: this.getRandomColor(), faveShape: "rectangle"}
           });
           this.graphData.edges.push({
-            data: {source: "s", target: x.text + " NP", faveColor: this.getRandomColor()}
-          });
-          this.graphData.edges.push({
             data: {source: x.text + " NP", target: x.text + " AP", faveColor: this.getRandomColor()}
-          });
-          this.graphData.edges.push({
-            data: {source: x.text + " NP", target: x.text, faveColor: this.getRandomColor()}
           });
           adjectives.forEach((y: ResultModel) => {
             this.graphData.nodes.push({
@@ -149,6 +292,7 @@ export class HomeComponent implements OnInit {
     if (index >= 1 && this.results[index - 1] && this.results[index - 1].part
       && this.results[index - 1].part.toLowerCase().indexOf("прикметник") >= 0) {
       adjectiveGroup.push(this.results[index - 1]);
+      const vidminok = this.results[index - 1].part_of_speech.split(" ")[0];
       index--;
       index--;
       while (index >= 0) {
@@ -156,10 +300,34 @@ export class HomeComponent implements OnInit {
           index--;
           continue;
         }
-        if (this.results[index] && this.results[index].part.toLowerCase().indexOf("прикметник") >= 0) {
+        if (this.results[index] && this.results[index].part.toLowerCase().indexOf("прикметник") >= 0
+          && this.results[index].part_of_speech.indexOf(vidminok) >= 0) {
           adjectiveGroup.push(this.results[index]);
+        } else {
+          break;
         }
         index--;
+      }
+    } else {
+      if ((index + 1) <= (this.results.length - 1) && this.results[index + 1] && this.results[index + 1].part
+        && this.results[index + 1].part.toLowerCase().indexOf("прикметник") >= 0) {
+        adjectiveGroup.push(this.results[index + 1]);
+        const vidminok = this.results[index + 1].part_of_speech.split(" ")[0];
+        index++;
+        index++;
+        while (index <= (this.results.length - 1)) {
+          if (this.results[index] && this.results[index].part.toLowerCase().indexOf("сполучник") >= 0) {
+            index++;
+            continue;
+          }
+          if (this.results[index] && this.results[index].part.toLowerCase().indexOf("прикметник") >= 0 &&
+            this.results[index].part_of_speech.indexOf(vidminok) >= 0) {
+            adjectiveGroup.push(this.results[index]);
+          } else {
+            break;
+          }
+          index++;
+        }
       }
     }
     return adjectiveGroup;
@@ -170,7 +338,7 @@ export class HomeComponent implements OnInit {
     return colors[this.getRandomArbitrary(0, colors.length - 1)];
   }
 
-  getRandomArbitrary (min: number, max: number) {
+  getRandomArbitrary(min: number, max: number) {
     let rand = min - 0.5 + Math.random() * (max - min + 1);
     rand = Math.round(rand);
     return rand;
